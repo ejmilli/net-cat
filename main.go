@@ -2,22 +2,12 @@ package main
 
 import (
 	"log"
-	"net"
 	"net-cat/Tools"
 )
 
 func main() {
 
-	port := Tools.PortInput()
-
-	ln, err := net.Listen("tcp", ":"+port)
-	if err != nil {
-		log.Fatalf("Error starting server: %v", err)
-	}
-	defer ln.Close()
-
-	log.Println("Chat server started on port", port, ". Connect with ncat localhost", port, ".")
-
+	ln := Tools.PortInput()
 	// Goroutine to handle broadcasting
 	go Tools.HandleBroadcasts()
 

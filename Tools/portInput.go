@@ -2,11 +2,12 @@ package Tools
 
 import (
 	"log"
+	"net"
 	"os"
 	"strconv"
 )
 
-func PortInput() string {
+func PortInput() net.Listener {
 	var port string
 	if len(os.Args) == 2 {
 		port = os.Args[1]
@@ -25,5 +26,13 @@ func PortInput() string {
 		port = "8989" // Default port
 	}
 
-	return port
+	ln, err := net.Listen("tcp", ":"+port)
+	if err != nil {
+		log.Fatalf("Error starting server: %v", err)
+	}
+	defer ln.Close()
+
+	log.Println("Chat server started on port", port, ". Connect with nc localhost", port, ".")
+
+	return ln
 }
