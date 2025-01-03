@@ -30,7 +30,6 @@ func PortInput() net.Listener {
 	if err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}
-	defer ln.Close()
 
 	log.Println("Chat server started on port", port, ". Connect with nc localhost", port, ".")
 
