@@ -11,17 +11,17 @@ import (
 )
 
 var (
-	clients   = make(map[net.Conn]string) // Map of active clients
-	broadcast = make(chan string)         // Channel for broadcasting messages
-	mu        sync.Mutex                  // Mutex to protect shared resources
+	clients   = make(map[net.Conn]string)
+	broadcast = make(chan string)
+	mu        sync.Mutex
 )
 
 func HandleBroadcasts() {
 	for {
-		// Wait for a message to broadcast
-		msg := <-broadcast
 
-		// Send the message to all connected clients
+		msg := <-broadcast
+		AddMessageToHistory(msg)
+
 		mu.Lock()
 		for conn := range clients {
 			fmt.Fprintln(conn, msg)
@@ -32,7 +32,7 @@ func HandleBroadcasts() {
 
 func HandleClient(conn net.Conn) {
 	defer func() {
-		// Remove the client when they disconnect
+		RemoveActiveClients()
 		mu.Lock()
 		delete(clients, conn)
 		mu.Unlock()
@@ -40,25 +40,9 @@ func HandleClient(conn net.Conn) {
 		broadcast <- "A user has left the chat."
 	}()
 
-	fmt.Fprintln(conn, "Welcome to TCP-Chat!")
-	fmt.Fprintln(conn, "         _nnnn_")
-	fmt.Fprintln(conn, "        dGGGGMMb")
-	fmt.Fprintln(conn, "       @p~qp~~qMb")
-	fmt.Fprintln(conn, "       M|@||@) M|")
-	fmt.Fprintln(conn, "       @,----.JM|")
-	fmt.Fprintln(conn, "      JS^\\__/  qKL")
-	fmt.Fprintln(conn, "     dZP        qKRb")
-	fmt.Fprintln(conn, "    dZP          qKKb")
-	fmt.Fprintln(conn, "   fZP            SMMb")
-	fmt.Fprintln(conn, "   HZM            MMMM")
-	fmt.Fprintln(conn, "   FqM            MMMM")
-	fmt.Fprintln(conn, " __| \".        |\\dS\"qML")
-	fmt.Fprintln(conn, " |    `.       | `' \\Zq")
-	fmt.Fprintln(conn, "_)      \\.___.,|     .'")
-	fmt.Fprintln(conn, "\\____   )MMMMMP|   .'")
-	fmt.Fprintln(conn, "     `-'       `--'")
-	fmt.Fprintln(conn)
+	AddActiveClients()
 
+	Penguin(conn)
 	fmt.Fprint(conn, "[ENTER YOUR NAME]:")
 	reader := bufio.NewReader(conn)
 	name, err := reader.ReadString('\n')
