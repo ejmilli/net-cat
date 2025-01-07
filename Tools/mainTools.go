@@ -29,15 +29,16 @@ func HandleBroadcasts() {
 		mu.Unlock()
 	}
 }
-
 func HandleClient(conn net.Conn) {
 	defer func() {
-		RemoveActiveClients()
 		mu.Lock()
+		name := clients[conn]
 		delete(clients, conn)
 		mu.Unlock()
+
 		conn.Close()
-		broadcast <- "A user has left the chat."
+		broadcast <- fmt.Sprintf("%s has left the chat.", name)
+		RemoveActiveClients()
 	}()
 
 	AddActiveClients()
@@ -52,24 +53,27 @@ func HandleClient(conn net.Conn) {
 	}
 	name = strings.TrimSpace(name)
 
-	// Add the client to the list
 	mu.Lock()
 	clients[conn] = name
 	mu.Unlock()
 
+	history := GetMessageHistory()
+	for _, msg := range history {
+		fmt.Fprintln(conn, msg)
+	}
+
 	broadcast <- fmt.Sprintf("%s has joined the chat.", name)
 
-	// Read messages from the client
 	for {
 		msg, err := reader.ReadString('\n')
 		if err != nil {
-			log.Printf("Error reading message from %s: %v", name, err)
+			log.Printf("%s left the chat. Error: %v", name, err)
 			return
 		}
+
 		msg = strings.TrimSpace(msg)
 
-		// Add timestamp to the message
 		timestamp := time.Now().Format("2006-01-02 15:04:05")
-		broadcast <- fmt.Sprintf("[%s] %s: %s", timestamp, name, msg)
+		broadcast <- fmt.Sprintf("[%s][%s]: %s", timestamp, name, msg)
 	}
 }
