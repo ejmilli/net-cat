@@ -20,6 +20,7 @@ func HandleBroadcasts() {
 	for {
 
 		msg := <-broadcast
+
 		AddMessageToHistory(msg)
 
 		mu.Lock()
@@ -51,6 +52,19 @@ func HandleClient(conn net.Conn) {
 		log.Printf("Error reading name: %v", err)
 		return
 	}
+
+	for name == "\n" {
+		fmt.Fprint(conn, "[ENTER YOUR NAME]:")
+		reader := bufio.NewReader(conn)
+		name, err = reader.ReadString('\n')
+
+		if err != nil {
+			log.Printf("Error reading name: %v", err)
+			return
+		}
+
+	}
+
 	name = strings.TrimSpace(name)
 
 	mu.Lock()
@@ -70,7 +84,9 @@ func HandleClient(conn net.Conn) {
 			log.Printf("%s left the chat. Error: %v", name, err)
 			return
 		}
-
+		if msg == "\n" {
+			continue
+		}
 		msg = strings.TrimSpace(msg)
 
 		timestamp := time.Now().Format("2006-01-02 15:04:05")
