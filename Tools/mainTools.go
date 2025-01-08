@@ -81,7 +81,6 @@ func HandleClient(conn net.Conn) {
 	for {
 		msg, err := reader.ReadString('\n')
 		if err != nil {
-			log.Printf("%s left the chat. Error: %v", name, err)
 			return
 		}
 		if msg == "\n" {
