@@ -53,7 +53,7 @@ func HandleClient(conn net.Conn) {
 		return
 	}
 
-	for name == "\n" {
+	for strings.TrimSpace(name) == "" {
 		fmt.Fprint(conn, "[ENTER YOUR NAME]:")
 		reader := bufio.NewReader(conn)
 		name, err = reader.ReadString('\n')
@@ -62,7 +62,6 @@ func HandleClient(conn net.Conn) {
 			log.Printf("Error reading name: %v", err)
 			return
 		}
-
 	}
 
 	name = strings.TrimSpace(name)
