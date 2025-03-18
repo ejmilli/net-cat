@@ -33,18 +33,16 @@ func HandleClient(conn net.Conn) {
 		return
 	}
 
-<<<<<<< HEAD
 	fmt.Println("conn:", conn)
 	fmt.Println("reader", reader)
 	fmt.Println("name:", name)
 	// Ensure a valid name is entered
 	for name == "\n" {
 		fmt.Fprintln(conn, "type your name bitch:")
-=======
 	for strings.TrimSpace(name) == "" {
 		fmt.Fprint(conn, "[ENTER YOUR NAME]:")
 		reader := bufio.NewReader(conn)
->>>>>>> 06f2b437d3862f4ae406cb6fe48246c002181e67
+
 		name, err = reader.ReadString('\n')
 		if err != nil {
 			log.Printf("Error reading name: %v", err)
@@ -92,7 +90,8 @@ func HandleClient(conn net.Conn) {
 		timestamp := time.Now().Format("2006-01-02 15:04:05")
 		broadcast <- fmt.Sprintf("[%s][%s]: %s", timestamp, name, msg)
 	}
-	
+
+}
 }
 
 // HandleBroadcasts: Processes and sends messages to all clients
