@@ -12,6 +12,7 @@ func main() {
 	const maxClients = 10
 
 	defer ln.Close()
+	
 	// Goroutine to handle broadcasting
 	go Tools.HandleBroadcasts()
 

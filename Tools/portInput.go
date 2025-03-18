@@ -18,7 +18,7 @@ func PortInput() net.Listener {
 		}
 
 		if portINT < 1024 || portINT > 65535 {
-			log.Fatalf("The range of the port number: 1024-65535. This is not a valid port number: %v", err)
+			log.Fatalf("The range of the port number: 1024-65535. This is not a valid port number: %v", portINT )
 		}
 	}
 
